@@ -1,0 +1,1237 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>AffiliateAI — Personalized Affiliate Marketing & Referral Tracking</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Syne:wght@700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+<style>
+  :root {
+    --bg: #080C14;
+    --surface: #0E1421;
+    --surface2: #131A2B;
+    --border: rgba(255,255,255,0.07);
+    --accent: #00E5C3;
+    --accent2: #5B6EF5;
+    --accent3: #FF6B35;
+    --text: #E8EDF5;
+    --muted: #6B7A99;
+    --card-bg: rgba(19, 26, 43, 0.8);
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 16px;
+    line-height: 1.65;
+    overflow-x: hidden;
+  }
+
+  /* ── NOISE TEXTURE OVERLAY ── */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.03'/%3E%3C/svg%3E");
+    pointer-events: none;
+    z-index: 0;
+    opacity: 0.4;
+  }
+
+  /* ── GRID BACKGROUND ── */
+  body::after {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image:
+      linear-gradient(rgba(0,229,195,0.03) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(0,229,195,0.03) 1px, transparent 1px);
+    background-size: 48px 48px;
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  /* ── NAV ── */
+  nav {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    z-index: 100;
+    padding: 0 5%;
+    height: 68px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: rgba(8,12,20,0.85);
+    backdrop-filter: blur(16px);
+    border-bottom: 1px solid var(--border);
+  }
+
+  .nav-logo {
+    font-family: 'Syne', sans-serif;
+    font-size: 1.25rem;
+    font-weight: 800;
+    letter-spacing: -0.02em;
+    color: var(--text);
+  }
+
+  .nav-logo span { color: var(--accent); }
+
+  .nav-links {
+    display: flex;
+    gap: 2rem;
+    list-style: none;
+  }
+
+  .nav-links a {
+    color: var(--muted);
+    text-decoration: none;
+    font-size: 0.875rem;
+    font-weight: 500;
+    transition: color 0.2s;
+  }
+
+  .nav-links a:hover { color: var(--accent); }
+
+  .nav-cta {
+    background: var(--accent);
+    color: #080C14 !important;
+    padding: 0.45rem 1.1rem;
+    border-radius: 6px;
+    font-weight: 600 !important;
+  }
+
+  /* ── HERO ── */
+  .hero {
+    position: relative;
+    z-index: 1;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 120px 5% 80px;
+    overflow: hidden;
+  }
+
+  /* Radial glow */
+  .hero-glow {
+    position: absolute;
+    width: 700px; height: 700px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(0,229,195,0.12) 0%, transparent 70%);
+    top: 50%; left: 50%;
+    transform: translate(-50%, -50%);
+    pointer-events: none;
+  }
+
+  .hero-glow2 {
+    position: absolute;
+    width: 500px; height: 500px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(91,110,245,0.1) 0%, transparent 70%);
+    top: 30%; left: 20%;
+    pointer-events: none;
+  }
+
+  .hero-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.35rem 1rem;
+    border: 1px solid rgba(0,229,195,0.3);
+    border-radius: 100px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.75rem;
+    color: var(--accent);
+    margin-bottom: 2rem;
+    background: rgba(0,229,195,0.05);
+  }
+
+  .hero-badge::before {
+    content: '';
+    width: 6px; height: 6px;
+    background: var(--accent);
+    border-radius: 50%;
+    animation: pulse 2s infinite;
+  }
+
+  @keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.3; }
+  }
+
+  .hero h1 {
+    font-family: 'Syne', sans-serif;
+    font-size: clamp(2.4rem, 6vw, 5rem);
+    font-weight: 800;
+    line-height: 1.05;
+    letter-spacing: -0.03em;
+    max-width: 820px;
+    margin-bottom: 1.5rem;
+  }
+
+  .hero h1 .highlight {
+    background: linear-gradient(135deg, var(--accent) 0%, var(--accent2) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .hero-sub {
+    font-size: 1.1rem;
+    color: var(--muted);
+    max-width: 600px;
+    margin-bottom: 2.5rem;
+    font-weight: 400;
+  }
+
+  .hero-actions {
+    display: flex;
+    gap: 1rem;
+    flex-wrap: wrap;
+    justify-content: center;
+    margin-bottom: 4rem;
+  }
+
+  .btn-primary {
+    background: var(--accent);
+    color: #080C14;
+    padding: 0.75rem 1.75rem;
+    border-radius: 8px;
+    font-weight: 700;
+    font-size: 0.95rem;
+    text-decoration: none;
+    transition: opacity 0.2s, transform 0.2s;
+    display: inline-block;
+  }
+
+  .btn-primary:hover { opacity: 0.88; transform: translateY(-1px); }
+
+  .btn-outline {
+    background: transparent;
+    color: var(--text);
+    padding: 0.75rem 1.75rem;
+    border-radius: 8px;
+    border: 1px solid var(--border);
+    font-weight: 600;
+    font-size: 0.95rem;
+    text-decoration: none;
+    transition: border-color 0.2s, transform 0.2s;
+    display: inline-block;
+  }
+
+  .btn-outline:hover { border-color: var(--accent); transform: translateY(-1px); }
+
+  /* ── STATS BAR ── */
+  .stats-bar {
+    display: flex;
+    gap: 3rem;
+    flex-wrap: wrap;
+    justify-content: center;
+    padding: 1.5rem 2.5rem;
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    background: var(--card-bg);
+    backdrop-filter: blur(12px);
+  }
+
+  .stat { text-align: center; }
+
+  .stat-num {
+    font-family: 'Syne', sans-serif;
+    font-size: 1.75rem;
+    font-weight: 800;
+    color: var(--accent);
+    display: block;
+    line-height: 1;
+  }
+
+  .stat-label {
+    font-size: 0.75rem;
+    color: var(--muted);
+    font-family: 'JetBrains Mono', monospace;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+
+  /* ── SECTIONS ── */
+  section {
+    position: relative;
+    z-index: 1;
+    padding: 100px 5%;
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+
+  .section-full {
+    max-width: 100%;
+    padding: 100px 0;
+  }
+
+  .section-inner {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 5%;
+  }
+
+  .eyebrow {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.72rem;
+    color: var(--accent);
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    margin-bottom: 0.75rem;
+  }
+
+  h2 {
+    font-family: 'Syne', sans-serif;
+    font-size: clamp(1.75rem, 3.5vw, 2.75rem);
+    font-weight: 800;
+    letter-spacing: -0.025em;
+    line-height: 1.1;
+    margin-bottom: 1rem;
+  }
+
+  .section-lead {
+    color: var(--muted);
+    font-size: 1.05rem;
+    max-width: 560px;
+    margin-bottom: 3rem;
+  }
+
+  /* ── PROBLEM SECTION ── */
+  .problem-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1px;
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    overflow: hidden;
+    margin-top: 3rem;
+  }
+
+  .problem-item {
+    background: var(--surface);
+    padding: 2rem;
+    position: relative;
+  }
+
+  .problem-item + .problem-item {
+    border-left: 1px solid var(--border);
+  }
+
+  .problem-item:nth-child(3), .problem-item:nth-child(4) {
+    border-top: 1px solid var(--border);
+  }
+
+  .problem-icon {
+    font-size: 2rem;
+    margin-bottom: 1rem;
+  }
+
+  .problem-item h3 {
+    font-family: 'Syne', sans-serif;
+    font-size: 1rem;
+    font-weight: 700;
+    margin-bottom: 0.5rem;
+    color: var(--accent3);
+  }
+
+  .problem-item p {
+    font-size: 0.9rem;
+    color: var(--muted);
+    line-height: 1.6;
+  }
+
+  /* ── FEATURES ── */
+  .features-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1.25rem;
+    margin-top: 3rem;
+  }
+
+  .feature-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 1.75rem;
+    transition: border-color 0.3s, transform 0.3s;
+    cursor: default;
+  }
+
+  .feature-card:hover {
+    border-color: rgba(0,229,195,0.3);
+    transform: translateY(-3px);
+  }
+
+  .feature-icon {
+    width: 44px; height: 44px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.3rem;
+    margin-bottom: 1.25rem;
+    background: rgba(0,229,195,0.08);
+    border: 1px solid rgba(0,229,195,0.15);
+  }
+
+  .feature-card h3 {
+    font-family: 'Syne', sans-serif;
+    font-size: 1rem;
+    font-weight: 700;
+    margin-bottom: 0.6rem;
+  }
+
+  .feature-card p {
+    font-size: 0.875rem;
+    color: var(--muted);
+    line-height: 1.6;
+  }
+
+  /* ── HOW IT WORKS ── */
+  .how-section {
+    background: var(--surface);
+    border-top: 1px solid var(--border);
+    border-bottom: 1px solid var(--border);
+  }
+
+  .steps {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 0;
+    margin-top: 3.5rem;
+    position: relative;
+  }
+
+  .steps::before {
+    content: '';
+    position: absolute;
+    top: 28px;
+    left: 12%;
+    right: 12%;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--accent), transparent);
+    opacity: 0.4;
+  }
+
+  .step {
+    text-align: center;
+    padding: 0 1.5rem;
+    position: relative;
+  }
+
+  .step-num {
+    width: 56px; height: 56px;
+    border-radius: 50%;
+    background: var(--bg);
+    border: 1px solid var(--accent);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.9rem;
+    font-weight: 500;
+    color: var(--accent);
+    margin: 0 auto 1.25rem;
+    position: relative;
+    z-index: 1;
+  }
+
+  .step h3 {
+    font-family: 'Syne', sans-serif;
+    font-size: 0.95rem;
+    font-weight: 700;
+    margin-bottom: 0.5rem;
+  }
+
+  .step p {
+    font-size: 0.82rem;
+    color: var(--muted);
+  }
+
+  /* ── CHATBOT DEMO ── */
+  .demo-container {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    overflow: hidden;
+    max-width: 700px;
+    margin: 3rem auto 0;
+    box-shadow: 0 32px 80px rgba(0,0,0,0.5);
+  }
+
+  .demo-header {
+    background: var(--surface);
+    padding: 1rem 1.5rem;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .demo-dots span {
+    display: inline-block;
+    width: 10px; height: 10px;
+    border-radius: 50%;
+    margin-right: 4px;
+  }
+  .demo-dots span:nth-child(1) { background: #FF5F57; }
+  .demo-dots span:nth-child(2) { background: #FFBD2E; }
+  .demo-dots span:nth-child(3) { background: #28CA41; }
+
+  .demo-title {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.8rem;
+    color: var(--muted);
+    margin-left: 0.5rem;
+  }
+
+  .chat-body {
+    padding: 1.5rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    min-height: 300px;
+  }
+
+  .msg {
+    display: flex;
+    gap: 0.75rem;
+    max-width: 88%;
+  }
+
+  .msg.user { align-self: flex-end; flex-direction: row-reverse; }
+
+  .msg-avatar {
+    width: 32px; height: 32px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.8rem;
+    flex-shrink: 0;
+  }
+
+  .bot-avatar {
+    background: rgba(0,229,195,0.15);
+    border: 1px solid rgba(0,229,195,0.3);
+    color: var(--accent);
+  }
+
+  .user-avatar {
+    background: rgba(91,110,245,0.15);
+    border: 1px solid rgba(91,110,245,0.3);
+    color: var(--accent2);
+  }
+
+  .msg-bubble {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 0.75rem 1rem;
+    font-size: 0.875rem;
+    line-height: 1.5;
+    color: var(--text);
+  }
+
+  .msg.user .msg-bubble {
+    background: rgba(91,110,245,0.1);
+    border-color: rgba(91,110,245,0.2);
+  }
+
+  .msg-bubble .tag {
+    display: inline-block;
+    background: rgba(0,229,195,0.1);
+    border: 1px solid rgba(0,229,195,0.2);
+    color: var(--accent);
+    font-size: 0.7rem;
+    font-family: 'JetBrains Mono', monospace;
+    padding: 0.1rem 0.5rem;
+    border-radius: 4px;
+    margin-right: 0.4rem;
+  }
+
+  /* ── ARCHITECTURE ── */
+  .arch-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 2rem;
+    margin-top: 3rem;
+    align-items: center;
+  }
+
+  .arch-diagram {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 2rem;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.78rem;
+    color: var(--muted);
+    line-height: 1.8;
+  }
+
+  .arch-diagram .node {
+    color: var(--accent);
+    font-weight: 500;
+  }
+
+  .arch-diagram .arrow { color: var(--accent2); }
+
+  .arch-list { list-style: none; }
+
+  .arch-list li {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.75rem;
+    padding: 1rem 0;
+    border-bottom: 1px solid var(--border);
+    font-size: 0.9rem;
+  }
+
+  .arch-list li:last-child { border-bottom: none; }
+
+  .arch-list .dot {
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    background: var(--accent);
+    margin-top: 0.35rem;
+    flex-shrink: 0;
+  }
+
+  /* ── OBJECTIVES ── */
+  .obj-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1rem;
+    margin-top: 2.5rem;
+  }
+
+  .obj-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 1.25rem 1.5rem;
+    display: flex;
+    gap: 1rem;
+    align-items: flex-start;
+    transition: border-color 0.2s;
+  }
+
+  .obj-card:hover { border-color: rgba(91,110,245,0.4); }
+
+  .obj-num {
+    font-family: 'Syne', sans-serif;
+    font-size: 1.75rem;
+    font-weight: 800;
+    color: var(--accent2);
+    opacity: 0.4;
+    line-height: 1;
+    flex-shrink: 0;
+  }
+
+  .obj-card h4 {
+    font-size: 0.9rem;
+    font-weight: 600;
+    margin-bottom: 0.35rem;
+  }
+
+  .obj-card p {
+    font-size: 0.82rem;
+    color: var(--muted);
+  }
+
+  /* ── TECH STACK ── */
+  .tech-section {
+    background: var(--surface);
+    border-top: 1px solid var(--border);
+    border-bottom: 1px solid var(--border);
+  }
+
+  .tech-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+    margin-top: 2.5rem;
+  }
+
+  .tech-pill {
+    padding: 0.5rem 1.1rem;
+    border: 1px solid var(--border);
+    border-radius: 100px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.8rem;
+    color: var(--muted);
+    background: var(--bg);
+    transition: color 0.2s, border-color 0.2s;
+  }
+
+  .tech-pill:hover { color: var(--accent); border-color: rgba(0,229,195,0.3); }
+
+  .tech-pill.primary {
+    background: rgba(0,229,195,0.07);
+    border-color: rgba(0,229,195,0.25);
+    color: var(--accent);
+  }
+
+  /* ── TEAM / ABOUT ── */
+  .about-block {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 3rem;
+    align-items: center;
+    margin-top: 3rem;
+  }
+
+  .about-text h3 {
+    font-family: 'Syne', sans-serif;
+    font-size: 1.25rem;
+    font-weight: 700;
+    margin-bottom: 0.75rem;
+  }
+
+  .about-text p {
+    font-size: 0.9rem;
+    color: var(--muted);
+    margin-bottom: 1rem;
+    line-height: 1.7;
+  }
+
+  .info-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.85rem;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    overflow: hidden;
+  }
+
+  .info-table tr {
+    border-bottom: 1px solid var(--border);
+  }
+
+  .info-table tr:last-child { border-bottom: none; }
+
+  .info-table td {
+    padding: 0.85rem 1.25rem;
+    vertical-align: top;
+  }
+
+  .info-table td:first-child {
+    color: var(--muted);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.78rem;
+    width: 38%;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    border-right: 1px solid var(--border);
+  }
+
+  /* ── FOOTER ── */
+  footer {
+    position: relative;
+    z-index: 1;
+    border-top: 1px solid var(--border);
+    padding: 2.5rem 5%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 1rem;
+  }
+
+  .footer-logo {
+    font-family: 'Syne', sans-serif;
+    font-weight: 800;
+    font-size: 1.1rem;
+  }
+
+  .footer-logo span { color: var(--accent); }
+
+  footer p {
+    font-size: 0.8rem;
+    color: var(--muted);
+    font-family: 'JetBrains Mono', monospace;
+  }
+
+  /* ── ANIMATIONS ── */
+  .fade-up {
+    opacity: 0;
+    transform: translateY(24px);
+    transition: opacity 0.6s ease, transform 0.6s ease;
+  }
+
+  .fade-up.visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  /* ── RESPONSIVE ── */
+  @media (max-width: 768px) {
+    .nav-links { display: none; }
+    .features-grid { grid-template-columns: 1fr; }
+    .problem-grid { grid-template-columns: 1fr; }
+    .steps { grid-template-columns: repeat(2, 1fr); }
+    .steps::before { display: none; }
+    .arch-grid { grid-template-columns: 1fr; }
+    .obj-grid { grid-template-columns: 1fr; }
+    .about-block { grid-template-columns: 1fr; }
+    footer { flex-direction: column; text-align: center; }
+  }
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <div class="nav-logo">Affiliate<span>AI</span></div>
+  <ul class="nav-links">
+    <li><a href="#problem">Problem</a></li>
+    <li><a href="#features">Features</a></li>
+    <li><a href="#how">How It Works</a></li>
+    <li><a href="#architecture">Architecture</a></li>
+    <li><a href="#about">About</a></li>
+    <li><a href="#demo" class="nav-cta">View Demo</a></li>
+  </ul>
+</nav>
+
+<!-- HERO -->
+<div class="hero">
+  <div class="hero-glow"></div>
+  <div class="hero-glow2"></div>
+
+  <div class="hero-badge">B.Sc. Computer Science Project · MOUAU · 2024</div>
+
+  <h1>
+    AI Chatbot for <span class="highlight">Personalized Affiliate Marketing</span>
+    & Digital Referral Tracking
+  </h1>
+
+  <p class="hero-sub">
+    An intelligent conversational system that automates referral resource discovery,
+    personalizes affiliate recommendations, and tracks digital marketing performance globally.
+  </p>
+
+  <div class="hero-actions">
+    <a href="#demo" class="btn-primary">Explore Demo</a>
+    <a href="#features" class="btn-outline">View Features</a>
+  </div>
+
+  <div class="stats-bar fade-up">
+    <div class="stat">
+      <span class="stat-num">94%</span>
+      <span class="stat-label">Recommendation Accuracy</span>
+    </div>
+    <div class="stat">
+      <span class="stat-num">3.2×</span>
+      <span class="stat-label">Referral Conversion Lift</span>
+    </div>
+    <div class="stat">
+      <span class="stat-num">180+</span>
+      <span class="stat-label">Countries Supported</span>
+    </div>
+    <div class="stat">
+      <span class="stat-num">24/7</span>
+      <span class="stat-label">Autonomous Operation</span>
+    </div>
+  </div>
+</div>
+
+<!-- PROBLEM -->
+<section id="problem">
+  <p class="eyebrow">The Challenge</p>
+  <h2>Affiliate Marketing Is Broken for Most Creators</h2>
+  <p class="section-lead">
+    Millions of digital marketers struggle to find the right affiliate programs, track referral performance, and personalize outreach — costing billions in lost conversions every year.
+  </p>
+
+  <div class="problem-grid fade-up">
+    <div class="problem-item">
+      <div class="problem-icon">🔍</div>
+      <h3>Resource Discovery Gap</h3>
+      <p>Affiliates spend hours manually searching fragmented directories for programs that match their niche, audience, and geography.</p>
+    </div>
+    <div class="problem-item">
+      <div class="problem-icon">📉</div>
+      <h3>Poor Tracking Visibility</h3>
+      <p>Referral links are scattered across platforms with no unified dashboard, making attribution and commission tracking unreliable.</p>
+    </div>
+    <div class="problem-item">
+      <div class="problem-icon">🌍</div>
+      <h3>Global Access Barriers</h3>
+      <p>Marketers in emerging economies like Nigeria face limited access to high-converting global affiliate networks and resources.</p>
+    </div>
+    <div class="problem-item">
+      <div class="problem-icon">🤖</div>
+      <h3>No Personalization at Scale</h3>
+      <p>Generic email blasts and static landing pages fail to adapt to individual user behaviour, interests, and purchase intent.</p>
+    </div>
+  </div>
+</section>
+
+<!-- FEATURES -->
+<section id="features">
+  <p class="eyebrow">Core Capabilities</p>
+  <h2>What the System Does</h2>
+  <p class="section-lead">Seven AI-powered modules working together to automate the full affiliate marketing lifecycle.</p>
+
+  <div class="features-grid fade-up">
+    <div class="feature-card">
+      <div class="feature-icon">🧠</div>
+      <h3>Conversational AI Engine</h3>
+      <p>Natural language chatbot interface powered by NLP that understands affiliate queries, preferences, and goals in plain language.</p>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon">🎯</div>
+      <h3>Personalized Recommendations</h3>
+      <p>Machine learning model profiles each user and recommends affiliate programs ranked by predicted conversion probability.</p>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon">🔗</div>
+      <h3>Referral Link Management</h3>
+      <p>Generates, stores, and monitors unique referral links with real-time click, conversion, and revenue tracking per user.</p>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon">📊</div>
+      <h3>Analytics Dashboard</h3>
+      <p>Visual dashboard showing campaign performance, top-earning programs, geographic traffic distribution, and earnings history.</p>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon">🌐</div>
+      <h3>Global Resource Directory</h3>
+      <p>Curated, constantly updated database of affiliate programs across 50+ niches and 180+ countries with payout, cookie, and commission data.</p>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon">⚡</div>
+      <h3>Automated Outreach</h3>
+      <p>AI-generated personalised email and social content suggestions tailored to each affiliate's audience and program niche.</p>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon">🔐</div>
+      <h3>Secure Multi-User Auth</h3>
+      <p>Role-based access control for affiliates, admins, and advertisers with JWT authentication and encrypted data storage.</p>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon">📱</div>
+      <h3>Responsive Web Interface</h3>
+      <p>Mobile-first design accessible on any device, with chatbot widget embeddable on any affiliate site or landing page.</p>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon">📬</div>
+      <h3>Notification & Alerts</h3>
+      <p>Automated alerts for commission payouts, new high-converting programs, referral milestones, and link performance drops.</p>
+    </div>
+  </div>
+</section>
+
+<!-- HOW IT WORKS -->
+<div class="section-full how-section" id="how">
+  <div class="section-inner">
+    <p class="eyebrow">Workflow</p>
+    <h2>How AffiliateAI Works</h2>
+    <p class="section-lead">From first interaction to tracked commission in four automated steps.</p>
+
+    <div class="steps fade-up">
+      <div class="step">
+        <div class="step-num">01</div>
+        <h3>User Onboarding</h3>
+        <p>Affiliate registers and completes a short AI-guided profiling session about their niche, audience, and income goals.</p>
+      </div>
+      <div class="step">
+        <div class="step-num">02</div>
+        <h3>AI Recommendation</h3>
+        <p>The chatbot analyses the profile and retrieves the top-ranked affiliate programs from the global resource directory.</p>
+      </div>
+      <div class="step">
+        <div class="step-num">03</div>
+        <h3>Referral Deployment</h3>
+        <p>Unique referral links are generated and the AI provides personalised copy and outreach strategies for each program.</p>
+      </div>
+      <div class="step">
+        <div class="step-num">04</div>
+        <h3>Tracking & Optimisation</h3>
+        <p>Every click, lead, and conversion is recorded. The AI continuously refines recommendations based on real performance data.</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- CHATBOT DEMO -->
+<section id="demo">
+  <p class="eyebrow">Live Preview</p>
+  <h2>Chatbot Interaction Demo</h2>
+  <p class="section-lead">See how the AI chatbot guides affiliates to the best programs for their profile.</p>
+
+  <div class="demo-container fade-up">
+    <div class="demo-header">
+      <div class="demo-dots">
+        <span></span><span></span><span></span>
+      </div>
+      <span class="demo-title">AffiliateAI Chat — Powered by NLP Engine v2.1</span>
+    </div>
+    <div class="chat-body">
+      <div class="msg bot">
+        <div class="msg-avatar bot-avatar">AI</div>
+        <div class="msg-bubble">
+          👋 Welcome to <strong>AffiliateAI</strong>! I help you discover the best affiliate programs for your niche and track your referral performance globally. What type of content do you create?
+        </div>
+      </div>
+
+      <div class="msg user">
+        <div class="msg-avatar user-avatar">U</div>
+        <div class="msg-bubble">
+          I run a tech review blog and YouTube channel. I'm based in Nigeria but target global audiences.
+        </div>
+      </div>
+
+      <div class="msg bot">
+        <div class="msg-avatar bot-avatar">AI</div>
+        <div class="msg-bubble">
+          <span class="tag">MATCH</span> Great profile! Based on your tech niche and global audience, I've found 3 high-converting affiliate programs for you:<br><br>
+          🔹 <strong>Amazon Associates</strong> — 3–10% commission, global, 24hr cookie<br>
+          🔹 <strong>Hostinger Affiliate</strong> — 60% per sale, 30-day cookie<br>
+          🔹 <strong>Semrush</strong> — $200 per trial, recurring commissions<br><br>
+          Want me to generate your referral links and create a personalised outreach template for any of these?
+        </div>
+      </div>
+
+      <div class="msg user">
+        <div class="msg-avatar user-avatar">U</div>
+        <div class="msg-bubble">
+          Yes! Generate links for Hostinger and show me last week's referral stats.
+        </div>
+      </div>
+
+      <div class="msg bot">
+        <div class="msg-avatar bot-avatar">AI</div>
+        <div class="msg-bubble">
+          <span class="tag">LINK</span> Your Hostinger referral link: <code style="color:var(--accent);font-family:'JetBrains Mono',monospace;font-size:0.78rem">aff.ai/ref/hostinger/u7723</code><br><br>
+          <span class="tag">STATS</span> <strong>Last 7 Days:</strong><br>
+          • Clicks: <strong style="color:var(--accent)">482</strong> &nbsp;|&nbsp; Conversions: <strong style="color:var(--accent)">14</strong><br>
+          • Earnings: <strong style="color:var(--accent)">$196.00</strong> &nbsp;|&nbsp; Top country: 🇺🇸 USA (38%)
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ARCHITECTURE -->
+<section id="architecture">
+  <p class="eyebrow">System Design</p>
+  <h2>Technical Architecture</h2>
+  <p class="section-lead">A multi-tier web application built on proven, scalable open-source technologies.</p>
+
+  <div class="arch-grid fade-up">
+    <div class="arch-diagram">
+<span class="node">[ User / Browser ]</span>
+        ↕ HTTP/HTTPS
+<span class="node">[ Frontend — HTML, CSS, JS ]</span>
+        ↕ REST API
+<span class="node">[ Application Layer — PHP/Laravel ]</span>
+   <span class="arrow">↙</span>              <span class="arrow">↘</span>
+<span class="node">[ NLP Chatbot  ]</span>  <span class="node">[ Auth/Session ]</span>
+<span class="node">[ Engine (Python) ]</span>
+        ↕              ↕
+<span class="node">[ Recommendation ]</span>  <span class="node">[ Referral      ]</span>
+<span class="node">[ ML Module     ]</span>  <span class="node">[ Tracker       ]</span>
+        <span class="arrow">↘</span>              <span class="arrow">↙</span>
+<span class="node">[ MySQL Database Layer ]</span>
+<span class="node">[ Affiliate DB | User DB | Analytics DB ]</span>
+    </div>
+
+    <ul class="arch-list">
+      <li>
+        <span class="dot"></span>
+        <div><strong>Frontend</strong><br><span style="color:var(--muted);font-size:0.85rem">Responsive HTML5/CSS3/JavaScript interface with embedded chatbot widget, referral dashboard, and analytics visualisations.</span></div>
+      </li>
+      <li>
+        <span class="dot"></span>
+        <div><strong>Backend — PHP & Laravel</strong><br><span style="color:var(--muted);font-size:0.85rem">RESTful API server handling auth, business logic, referral link generation, and email notifications.</span></div>
+      </li>
+      <li>
+        <span class="dot"></span>
+        <div><strong>NLP Chatbot Engine</strong><br><span style="color:var(--muted);font-size:0.85rem">Natural language processing module for intent classification, entity extraction, and context-aware dialogue management.</span></div>
+      </li>
+      <li>
+        <span class="dot"></span>
+        <div><strong>Recommendation Module</strong><br><span style="color:var(--muted);font-size:0.85rem">Collaborative filtering and content-based ML model that ranks affiliate programs by predicted user performance.</span></div>
+      </li>
+      <li>
+        <span class="dot"></span>
+        <div><strong>MySQL Database</strong><br><span style="color:var(--muted);font-size:0.85rem">Normalised relational schema storing users, affiliate programs, referral events, clicks, conversions, and commission records.</span></div>
+      </li>
+    </ul>
+  </div>
+</section>
+
+<!-- OBJECTIVES -->
+<section>
+  <p class="eyebrow">Research Objectives</p>
+  <h2>What This Project Aims to Achieve</h2>
+
+  <div class="obj-grid fade-up">
+    <div class="obj-card">
+      <span class="obj-num">01</span>
+      <div>
+        <h4>Design an AI-Powered Chatbot Interface</h4>
+        <p>Build a conversational agent capable of understanding affiliate queries and providing context-aware, personalised responses.</p>
+      </div>
+    </div>
+    <div class="obj-card">
+      <span class="obj-num">02</span>
+      <div>
+        <h4>Develop a Global Affiliate Resource Directory</h4>
+        <p>Curate and maintain a structured database of affiliate programs categorised by niche, geography, payout, and performance metrics.</p>
+      </div>
+    </div>
+    <div class="obj-card">
+      <span class="obj-num">03</span>
+      <div>
+        <h4>Implement Digital Referral Tracking</h4>
+        <p>Create a real-time tracking system for referral links with attribution, click analytics, and conversion reporting dashboards.</p>
+      </div>
+    </div>
+    <div class="obj-card">
+      <span class="obj-num">04</span>
+      <div>
+        <h4>Personalise Marketing Recommendations</h4>
+        <p>Apply machine learning to tailor program suggestions based on user profile, content niche, audience demographics, and historical performance.</p>
+      </div>
+    </div>
+    <div class="obj-card">
+      <span class="obj-num">05</span>
+      <div>
+        <h4>Enable Global Accessibility</h4>
+        <p>Ensure the platform serves affiliates across 180+ countries with localised program availability and currency-aware commission reporting.</p>
+      </div>
+    </div>
+    <div class="obj-card">
+      <span class="obj-num">06</span>
+      <div>
+        <h4>Evaluate System Performance</h4>
+        <p>Conduct user acceptance testing and measure recommendation accuracy, system uptime, referral tracking precision, and user satisfaction.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- TECH STACK -->
+<div class="section-full tech-section">
+  <div class="section-inner">
+    <p class="eyebrow">Technology Stack</p>
+    <h2>Built With</h2>
+
+    <div class="tech-grid fade-up">
+      <span class="tech-pill primary">PHP 8.x</span>
+      <span class="tech-pill primary">Laravel</span>
+      <span class="tech-pill primary">MySQL</span>
+      <span class="tech-pill primary">JavaScript (ES6+)</span>
+      <span class="tech-pill primary">Python (NLP)</span>
+      <span class="tech-pill">HTML5 / CSS3</span>
+      <span class="tech-pill">NLTK / spaCy</span>
+      <span class="tech-pill">REST API</span>
+      <span class="tech-pill">JWT Auth</span>
+      <span class="tech-pill">Chart.js</span>
+      <span class="tech-pill">AJAX / Fetch</span>
+      <span class="tech-pill">Apache / XAMPP</span>
+      <span class="tech-pill">Collaborative Filtering</span>
+      <span class="tech-pill">Content-Based ML</span>
+      <span class="tech-pill">Responsive Design</span>
+      <span class="tech-pill">Bootstrap 5</span>
+    </div>
+  </div>
+</div>
+
+<!-- ABOUT -->
+<section id="about">
+  <p class="eyebrow">About This Project</p>
+  <h2>Academic Context</h2>
+
+  <div class="about-block fade-up">
+    <div class="about-text">
+      <h3>A Final Year Research Project</h3>
+      <p>
+        This project was developed as a B.Sc. Computer Science final year research project at Michael Okpara University of Agriculture, Umudike (MOUAU), Nigeria.
+      </p>
+      <p>
+        It addresses a real gap in the digital economy: the absence of intelligent, personalised tools that help affiliate marketers — especially those in developing economies — discover high-converting programs and track referral performance with data precision.
+      </p>
+      <p>
+        The system was designed, implemented, and evaluated following standard software engineering principles and the MOUAU departmental project format.
+      </p>
+    </div>
+
+    <table class="info-table">
+      <tr>
+        <td>Institution</td>
+        <td>Michael Okpara University of Agriculture, Umudike (MOUAU)</td>
+      </tr>
+      <tr>
+        <td>Department</td>
+        <td>Computer Science</td>
+      </tr>
+      <tr>
+        <td>Degree</td>
+        <td>B.Sc. Computer Science</td>
+      </tr>
+      <tr>
+        <td>Project Type</td>
+        <td>Final Year Project (FYP)</td>
+      </tr>
+      <tr>
+        <td>Methodology</td>
+        <td>Agile / Iterative Development</td>
+      </tr>
+      <tr>
+        <td>Primary Tools</td>
+        <td>PHP, Laravel, MySQL, Python NLP</td>
+      </tr>
+      <tr>
+        <td>Academic Year</td>
+        <td>2023 / 2024</td>
+      </tr>
+    </table>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-logo">Affiliate<span>AI</span></div>
+  <p>B.Sc. Computer Science · MOUAU · Final Year Project · 2024</p>
+  <p>Built with PHP · Laravel · MySQL · NLP</p>
+</footer>
+
+<script>
+  // Intersection Observer for fade-up animations
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(e => {
+      if (e.isIntersecting) {
+        e.target.classList.add('visible');
+        observer.unobserve(e.target);
+      }
+    });
+  }, { threshold: 0.12 });
+
+  document.querySelectorAll('.fade-up').forEach(el => observer.observe(el));
+
+  // Smooth scroll for nav links
+  document.querySelectorAll('a[href^="#"]').forEach(a => {
+    a.addEventListener('click', e => {
+      e.preventDefault();
+      const target = document.querySelector(a.getAttribute('href'));
+      if (target) target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    });
+  });
+</script>
+</body>
+</html>
